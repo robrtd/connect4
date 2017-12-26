@@ -1,7 +1,13 @@
 import C4_Game as C4G
 import random
 
-STARTPLAYER=-1
+
+def get_start_player():
+    p = 0
+    while p == 0:
+        p = random.randint(-1,1)
+    return p
+
 
 def ask_pos():
     moves = range(1,8)
@@ -10,6 +16,7 @@ def ask_pos():
     while inp not in moves:
         inp = input()
     return inp
+
 
 def get_computer_move(board, player):
     for run in range(2):
@@ -22,6 +29,7 @@ def get_computer_move(board, player):
 
     return random.randint(1, 7)
 
+STARTPLAYER=get_start_player()
 game = C4G.C4_Game()
 if STARTPLAYER == -1:
     game.set(4)

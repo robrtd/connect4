@@ -19,6 +19,7 @@ class C4_Game:
         if not move:
             move = self.move
         return self.board[move].copy()
+
     def set(self, pos):
         if self.is_over() or not self.board[self.move].set(pos - 1, self.player):
             return False

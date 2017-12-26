@@ -14,7 +14,10 @@ def ask_pos():
     print("Which pos (1-7)? ")
     inp = ''
     while inp not in moves:
-        inp = input()
+        try:
+            inp = int(input())
+        except ValueError:
+            inp = ''
     return inp
 
 

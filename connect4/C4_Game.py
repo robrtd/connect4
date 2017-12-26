@@ -5,6 +5,9 @@ class C4_Game:
     def __init__(self, startPlayer = 1):
         self.board = []
         self.board.append(C4B.C4_Board())
+        self.actions = []
+        self.rewards = [0]
+        self.numActions = 7
         self.move = 0
         self.player = startPlayer
 
@@ -20,9 +23,15 @@ class C4_Game:
             move = self.move
         return self.board[move].copy()
 
+    def set_stone_by_index(self, index, player):
+        assert(player == self.player)
+        return self.set(index + 1)
+
     def set(self, pos):
         if self.is_over() or not self.board[self.move].set(pos - 1, self.player):
             return False
+
+        self.actions.append(pos - 1)
 
         if self.is_over():
             return True

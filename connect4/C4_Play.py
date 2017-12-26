@@ -1,7 +1,7 @@
 import C4_Game as C4G
 import random
 
-STARTPLAYER=1
+STARTPLAYER=-1
 
 def ask_pos():
     moves = range(1,8)
@@ -23,9 +23,9 @@ def get_computer_move(board, player):
     return random.randint(1, 7)
 
 game = C4G.C4_Game()
-game.show()
 if STARTPLAYER == -1:
     game.set(4)
+game.show()
 while not game.is_over():
     while not game.set(ask_pos()):
         pass

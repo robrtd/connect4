@@ -27,6 +27,7 @@ class C4_Board:
         print('--1-2-3-4-5-6-7--')
 
     def set(self, pos, player):
+        assert(pos >= 0 and pos < 7)
         for x in range(6):
             if self.board[x,pos] == 0:
                 self.board[x,pos] = player

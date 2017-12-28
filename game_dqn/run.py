@@ -5,7 +5,7 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG,format='%(levelname)s:%(asctime)s %(message)s')
 
-do_learn=False
+do_learn=True
 do_start_from_scratch=False
 
 teacher = TeachDQN.TeachDQN(gameClass=C4_Game, do_learn=do_learn, do_start_from_scratch=do_start_from_scratch)

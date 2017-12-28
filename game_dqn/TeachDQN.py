@@ -30,7 +30,9 @@ class TeachDQN:
         # random choice with monte-carlo weights
         # until a valid move is found
         action_index = -1
-        while not game.set_stone_by_index(action_index, player):
+        skipFirst = True
+        while not skipFirst and not game.set_stone_by_index(action_index, player):
+            skipFirst = False
             dice = random.random()
             x = 0
             for i in range(action.shape[0]):
@@ -99,17 +101,19 @@ class TeachDQN:
         #    self.reference_stati = np.load(REF_STATI_FILE)
 
     def learn(self):
+        ITERATIONS=10
+
         id = 0
         if self.do_learn:
             q_progress_list = []
-            for iteration in range(2):
+            for iteration in range(ITERATIONS):
                 games = []
                 for id in range(1000):
                     # Start testing the game
                     game = self.gameClass()
                     games.append(game)
 
-                    self.play_game(game, epsilon = 0.5 - 0.5/(15-iteration))
+                    self.play_game(game, epsilon = 0.5 - 0.5*iteration/(ITERATIONS-1.))
 
                 num_actions = self.gameClass.get_numActions()
                 #size = self.gameClass.get_size()

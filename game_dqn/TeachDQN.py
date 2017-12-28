@@ -31,7 +31,7 @@ class TeachDQN:
         # until a valid move is found
         action_index = -1
         skipFirst = True
-        while not skipFirst and not game.set_stone_by_index(action_index, player):
+        while skipFirst or not game.set_stone_by_index(action_index, player):
             skipFirst = False
             dice = random.random()
             x = 0
@@ -101,12 +101,13 @@ class TeachDQN:
         #    self.reference_stati = np.load(REF_STATI_FILE)
 
     def learn(self):
-        ITERATIONS=10
+        ITERATIONS=2
 
         id = 0
         if self.do_learn:
             q_progress_list = []
             for iteration in range(ITERATIONS):
+                logging.info("  Starting iteration %s / %s" % (iteration, ITERATIONS-1))
                 games = []
                 for id in range(1000):
                     # Start testing the game

@@ -41,7 +41,7 @@ class C4_Board:
         return np.min(b.board) == 0
 
     def is_over(self):
-        return self.get_winner() != 0 or not self._is_move_possible()
+        return not self._is_move_possible() or self.get_winner() != 0
 
     def get_winner(self):
         winner = self._check_4_in_col_()

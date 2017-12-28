@@ -45,11 +45,13 @@ class C4_Game:
             player = self.player
         assert(player == self.player)
         next_board = self.board[self.move].copy()
-        if self.is_over() or not next_board.set(index, self.player):
+        if self.is_over():
+            return False
+        if not next_board.set(index, self.player):
             return False
 
         self.actions[self.move] = index
-        self.rewards[self.move] = self.get_winner()
+        self.rewards[self.move] = next_board.get_winner()
 
         if self.is_over():
             return True

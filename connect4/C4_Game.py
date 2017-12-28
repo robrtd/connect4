@@ -3,13 +3,13 @@ import numpy as np
 import random
 
 class C4_Game:
+    numActions = 7
 
     def __init__(self, startPlayer = 1):
         self.board = []
         self.board.append(C4B.C4_Board())
         self.actions = [None]
         self.rewards = [0]
-        self.numActions = 7
         self.move = 0
         self.player = startPlayer
 
@@ -100,6 +100,13 @@ class C4_Game:
     def get_screens(self):
         return range(len(self.board))
 
+
+    def get_screen(self, move_index = None):
+        if move_index is None:
+            move_index = self.move
+        return self.board[move_index]
+
+
     def set(self, pos):
         return self.set_stone_by_index(pos - 1)
 
@@ -110,7 +117,10 @@ class C4_Game:
     def is_over(self):
         return self.board[self.move].is_over()
 
+    @staticmethod
+    def get_numActions():
+        return 1*C4_Game.numActions
 
-
-
-
+    #@staticmethod
+    #def get_size():
+    #    return (6,C4_Game.numActions)

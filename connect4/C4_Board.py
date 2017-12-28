@@ -54,17 +54,14 @@ class C4_Board:
         winner = self._check_4_in_diag_()
         return winner
 
-    def get_status(self, player_to_play=None, shape=None):
+    def get_status(self, player_to_play=None, shape=(6, 7, 1)):
         # display board, as if it was $player_to_play's move
         if player_to_play is None or player_to_play != self.last_move_player:
             b = self.board
         else:
             b = np.multiply(-1, self.board)
 
-        #if shape is None:
-        #    shape = (self.sizeX, self.sizeY, 1)
-        #return b.reshape(shape)
-        return b
+        return b.reshape(shape)
 
 
     def _check_4_in_diag_(self):

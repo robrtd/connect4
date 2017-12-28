@@ -1,8 +1,9 @@
 import C4_Game as C4G
 import random
+from TeachDQN import TeachDQN
+from C4_DQN_Model import C4_DQN_Model
 
-
-def get_start_player():
+def get_computer_player_id():
     p = 0
     while p == 0:
         p = random.randint(-1,1)
@@ -32,19 +33,25 @@ def get_computer_move(board, player):
 
     return random.randint(1, 7)
 
-STARTPLAYER=get_start_player()
+COMPUTERPLAYERID=get_computer_player_id()
 game = C4G.C4_Game()
-if STARTPLAYER == -1:
-    game.set(4)
-game.show()
+
+computer_player = TeachDQN()
+computer_player.load_model(model_class=C4_DQN_Model, model_file='game_dqn/c4_model.h5')
+
 while not game.is_over():
+    if COMPUTERPLAYERID == 1:
+        computer_player.do_best_move(game, 1)
+        if game.is_over():
+            break
+    game.show()
     while not game.set(ask_pos()):
         pass
     if game.is_over():
         break
-    while not game.set(get_computer_move(game.copy_board(), -1*STARTPLAYER)):
-        pass
-    game.show()
+    #while not game.set(get_computer_move(game.copy_board(), -1*STARTPLAYER)):
+    if COMPUTERPLAYERID == -1:
+        computer_player.do_best_move(game, -1)
 game.show()
 print(game.get_winner())
 

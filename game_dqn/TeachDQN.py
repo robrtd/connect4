@@ -7,8 +7,9 @@ REF_STATI_FILE = 'GAME_ref_stati.npy'
 
 class TeachDQN:
 
-    def __init__(self, gameClass=None, do_learn=False, do_start_from_scratch=False):
+    def __init__(self, gameClass=None, do_learn=False, do_start_from_scratch=False, win_reward=1):
         self.gameClass = gameClass
+        self.win_reward = win_reward
 
         self.do_learn = do_learn
         self.do_start_from_scratch = do_start_from_scratch
@@ -112,7 +113,7 @@ class TeachDQN:
                 games = []
                 for id in range(1000):
                     # Start testing the game
-                    game = self.gameClass()
+                    game = self.gameClass(win_reward=self.win_reward)
                     games.append(game)
 
                     self.play_game(game, epsilon = 0.5 - 0.5*iteration/(ITERATIONS-1.))
@@ -135,7 +136,7 @@ class TeachDQN:
         while n < 15:
             n += 1
 
-            game = self.gameClass()
+            game = self.gameClass(win_reward=self.win_reward)
             self.play_game(game, verbose=0, epsilon=0.0)
 
             winner = game.get_winner()

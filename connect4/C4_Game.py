@@ -5,13 +5,14 @@ import random
 class C4_Game:
     numActions = 7
 
-    def __init__(self, startPlayer = 1):
+    def __init__(self, startPlayer = 1, win_reward=1):
         self.board = []
         self.board.append(C4B.C4_Board())
         self.actions = [None]
         self.rewards = [0]
         self.move = 0
         self.player = startPlayer
+        self.win_reward = win_reward
 
     def show(self, move = None):
         if not move:
@@ -51,7 +52,7 @@ class C4_Game:
             return False
 
         self.actions[self.move] = index
-        self.rewards[self.move] = next_board.get_winner()
+        self.rewards[self.move] = next_board.get_winner()*self.win_reward
 
         if self.is_over():
             return True

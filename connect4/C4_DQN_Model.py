@@ -1,6 +1,7 @@
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten
-from keras.layers.convolutional import Convolution2D
+from keras.layers.convolutional import Conv2D
+from keras.layers.pooling import MaxPooling2D
 from keras.optimizers import sgd, RMSprop
 
 class C4_DQN_Model(object):
@@ -12,13 +13,14 @@ class C4_DQN_Model(object):
 
     @staticmethod
     def create_model():
-        return C4_DQN_Model.create_model_conv()
+        #return C4_DQN_Model.create_model_conv()
+        return C4_DQN_Model.create_model_deep()
 
     @staticmethod
     def create_model_conv():
         model = Sequential()
 
-        model.add(Convolution2D(6 * 7, 2, 2, input_shape=C4_DQN_Model.model_shape, subsample=(1, 1), dim_ordering='tf', activation='relu'))
+        model.add(Conv2D(6 * 7, 2, 2, input_shape=C4_DQN_Model.model_shape, subsample=(1, 1), dim_ordering='tf', activation='relu'))
         model.add(Flatten())
         model.add(Dense(42*42, activation='relu'))
         model.add(Dense(7, init='normal', activation='linear'))
@@ -27,6 +29,26 @@ class C4_DQN_Model(object):
         model.compile(loss="mse", optimizer=rms)
 
         return model
+
+    @staticmethod
+    def create_model_deep():
+        model = Sequential()
+
+        model.add(Conv2D(filters=81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', input_shape=C4_DQN_Model.model_shape, activation='relu'))
+        model.add(Conv2D(filters=3*81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', activation='relu'))
+        model.add(Conv2D(filters=9*81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', activation='relu'))
+        model.add(MaxPooling2D(pool_size=(2,2), data_format='channels_last'))
+        model.add(Dropout(rate=0.2))
+        model.add(Flatten())
+        model.add(Dense(9*81, activation='relu'))
+        model.add(Dropout(rate=0.4))
+        model.add(Dense(7, activation='linear'))
+        # linear output so we can have range of real-valued outputs -- stolen from http://outlace.com/Reinforcement-Learning-Part-3/
+        rms = RMSprop()
+        model.compile(loss="mse", optimizer=rms)
+
+        return model
+
 
     @staticmethod
     def create_model_fcn():

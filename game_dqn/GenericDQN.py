@@ -55,7 +55,7 @@ class GenericDQN(object):
 
             # adapt model
             X_train, X_test, y_train, y_test = train_test_split(all_inputs, all_targets, test_size=0.01) #Xrandom_state=42)
-            model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=self.fixed_learning_epochs, batch_size=self.batch_size)
+            model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=self.fixed_learning_epochs, batch_size=self.batch_size)
             scores = model.evaluate(X_test, y_test, verbose=0)
 
             print(e, scores)

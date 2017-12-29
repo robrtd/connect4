@@ -10,7 +10,7 @@ do_start_from_scratch=True
 
 teacher = TeachDQN.TeachDQN(gameClass=C4_Game, do_learn=do_learn, do_start_from_scratch=do_start_from_scratch)
 
-teacher.load_model(model_class=C4_DQN_Model, model_file='c4_model.h5')
+teacher.load_model(model_class=C4_DQN_Model, model_file='c4_model.h5', single_actions=False)
 
 if do_learn:
     logging.info("Starting to learn...")

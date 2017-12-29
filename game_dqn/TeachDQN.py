@@ -72,11 +72,12 @@ class TeachDQN:
                 game.perform_random_move(player=player)
             player *= -1
 
-    def load_model(self, model_class, model_file='generic_model.h5'):
+    def load_model(self, model_class, model_file='generic_model.h5', single_actions=False):
         #self.model = DQN_TTT_Model.DQN_TTT_Model.create_model_fcn()
         self.model = model_class.create_model()
         self.MODEL_FILE = model_file
         self.model_shape = model_class.get_model_shape()
+        self.single_actions = single_actions
         logging.debug("model_shape: " + str(self.model_shape))
 
         if not self.do_start_from_scratch:
@@ -118,10 +119,10 @@ class TeachDQN:
 
                 num_actions = self.gameClass.get_numActions()
                 #size = self.gameClass.get_size()
-                dqn_learner = GenericDQN(num_actions = num_actions, q_learning_epochs=3, fixed_learning_epochs=1)
+                dqn_learner = GenericDQN(num_actions = num_actions, single_actions=self.single_actions, q_learning_epochs=3, fixed_learning_epochs=1)
                 dqn_learner.load_games(games, input_shape=self.model_shape)
 
-                q_progress = dqn_learner.learn(model=self.model, model_file=self.MODEL_FILE, start_from_scratch=self.do_start_from_scratch, input_shape=None, single_actions=True)
+                q_progress = dqn_learner.learn(model=self.model, model_file=self.MODEL_FILE, start_from_scratch=self.do_start_from_scratch, input_shape=None)
                 print(q_progress)
                 q_progress_list.append(q_progress)
 

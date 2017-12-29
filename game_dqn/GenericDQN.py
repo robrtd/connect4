@@ -4,8 +4,9 @@ import logging
 import ExperienceReplay as er
 
 class GenericDQN(object):
-    def __init__(self, num_actions, q_learning_epochs=2, fixed_learning_epochs=2, batch_size=50):
+    def __init__(self, num_actions, single_actions=False, q_learning_epochs=2, fixed_learning_epochs=2, batch_size=50):
         self.num_actions = num_actions
+        self.single_actions = single_actions
         self.q_learning_epochs = q_learning_epochs
         self.fixed_learning_epochs = fixed_learning_epochs
         self.batch_size = batch_size
@@ -21,7 +22,7 @@ class GenericDQN(object):
             self.experience_list.append(exp_replay)
 
 
-    def learn(self, model, model_file = None, start_from_scratch=False, reference_states=None, input_shape=None, single_actions = False):
+    def learn(self, model, model_file = None, start_from_scratch=False, reference_states=None, input_shape=None):
         q_progress = {'q_values': [], 'epochs': []}
 
         if model_file is not None and not start_from_scratch:
@@ -40,7 +41,7 @@ class GenericDQN(object):
 
             for el in self.experience_list:
                 # the Q-learning magic happens here...
-                inputs, targets = el.get_batch(model, single_actions=single_actions)
+                inputs, targets = el.get_batch(model, single_actions=self.single_actions)
 
                 if input_shape is not None:
                     inputs.reshape((inputs.shape[0],) + input_shape)

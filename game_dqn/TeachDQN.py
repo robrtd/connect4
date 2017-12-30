@@ -17,6 +17,7 @@ class TeachDQN:
         self.model = None
         self.model_shape = None
 
+    # TODO: parallelize model.predict, i.e. play several games in parallel
     def get_model_action(self, game):
         shape = (1,) + self.model_shape
         move = self.model.predict(game.get_screen().get_status(player_to_play=1, shape=shape))
@@ -74,10 +75,10 @@ class TeachDQN:
             player *= -1
 
     def load_model(self, model_class, model_file='generic_model.h5', single_actions=False):
-        #self.model = DQN_TTT_Model.DQN_TTT_Model.create_model_fcn()
         self.model = model_class.create_model()
         self.MODEL_FILE = model_file
         self.model_shape = model_class.get_model_shape()
+        self.channels = model_class.get_channels()
         self.single_actions = single_actions
         logging.debug("model_shape: " + str(self.model_shape))
 
@@ -113,7 +114,7 @@ class TeachDQN:
                 games = []
                 for id in range(1000):
                     # Start testing the game
-                    game = self.gameClass(win_reward=self.win_reward)
+                    game = self.gameClass(win_reward=self.win_reward, channels=self.channels)
                     games.append(game)
 
                     self.play_game(game, epsilon = 0.5 - 0.5*iteration/(ITERATIONS-1.))
@@ -136,7 +137,7 @@ class TeachDQN:
         while n < 15:
             n += 1
 
-            game = self.gameClass(win_reward=self.win_reward)
+            game = self.gameClass(win_reward=self.win_reward, channels=self.channels)
             self.play_game(game, verbose=0, epsilon=0.0)
 
             winner = game.get_winner()

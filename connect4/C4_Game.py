@@ -5,9 +5,10 @@ import random
 class C4_Game:
     numActions = 7
 
-    def __init__(self, startPlayer = 1, win_reward=1):
+    def __init__(self, startPlayer = 1, win_reward=1, channels=1):
+        self.channels = channels
         self.board = []
-        self.board.append(C4B.C4_Board())
+        self.board.append(C4B.C4_Board(channels=self.channels))
         self.actions = [None]
         self.rewards = [0]
         self.move = 0

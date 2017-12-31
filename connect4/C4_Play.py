@@ -34,7 +34,7 @@ def get_computer_move(board, player):
     return random.randint(1, 7)
 
 computer_player = TeachDQN()
-computer_player.load_model(model_class=C4_DQN_Model, model_file='game_dqn/c4_model_deep.h5')
+computer_player.load_model(model_class=C4_DQN_Model, model_file='game_dqn/c4_model_deep_channel2_testr10.h5')
 
 COMPUTERPLAYERID=get_computer_player_id()
 game = C4G.C4_Game(channels=C4_DQN_Model.get_channels())

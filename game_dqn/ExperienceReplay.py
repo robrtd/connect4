@@ -34,14 +34,23 @@ class ExperienceReplay(object):
         # Q-values are the predictions of the next state, i.e. we simply shift target by one
         Q_sa = targets[1:]
 
-        for i in range(0,self.max_memory):
-            # reward_t + gamma * max_a' Q(s', a')
-            reward_value = self.reward_t[i]
-            if not self.game_over[i]: # same as: i < self.max_memory - 1
-                # targets in next screen are possible oppponents rewards
-                # therefore, we subtract them
-                reward_value -= self.discount * np.max(Q_sa[i])
+        if False:
+            for i in range(self.max_memory):
+                # reward_t + gamma * max_a' Q(s', a')
+                reward_value = self.reward_t[i]
+                if not self.game_over[i]: # same as: i < self.max_memory - 1
+                    # targets in next screen are possible opponents rewards
+                    # therefore, we subtract them
+                    reward_value -= self.discount * np.max(Q_sa[i])
 
-            targets[i, np.argmax(self.action_t[i])] = reward_value
+                targets[i, np.argmax(self.action_t[i])] = reward_value
+        else:
+            for i in reversed(range(self.max_memory)):
+                reward_value = self.reward_t[i]
+                if not self.game_over[i]:
+                    # targets in next screen are possible opponents rewards
+                    # therefore, we subtract them
+                    reward_value -= self.discount * np.max(Q_sa[i])
+                targets[i, np.argmax(self.action_t[i])] = reward_value
 
         return inputs, targets

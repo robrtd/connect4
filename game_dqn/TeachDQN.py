@@ -121,7 +121,7 @@ class TeachDQN:
 
                 num_actions = self.gameClass.get_numActions()
                 #size = self.gameClass.get_size()
-                dqn_learner = GenericDQN(num_actions = num_actions, single_actions=self.single_actions, q_learning_epochs=3, fixed_learning_epochs=1)
+                dqn_learner = GenericDQN(num_actions = num_actions, single_actions=self.single_actions, q_learning_epochs=1, fixed_learning_epochs=3)
                 dqn_learner.load_games(games, input_shape=self.model_shape)
 
                 q_progress = dqn_learner.learn(model=self.model, model_file=self.MODEL_FILE, start_from_scratch=self.do_start_from_scratch, input_shape=None)

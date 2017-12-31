@@ -1,7 +1,7 @@
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten
 from keras.layers.convolutional import Conv2D
-from keras.layers.pooling import MaxPooling2D
+from keras.initializers import RandomUniform
 from keras.optimizers import sgd, RMSprop
 import logging
 
@@ -37,25 +37,19 @@ class C4_DQN_Model(object):
 
     @staticmethod
     def create_model_deep():
+        init_random = RandomUniform(minval=-0.05, maxval=0.05, seed=None)
         model = Sequential()
 
-        model.add(Conv2D(filters=81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', input_shape=C4_DQN_Model.model_shape, activation='relu'))
-        logging.debug('Layer-1 output-shape: ' + str(model.output_shape))
-        model.add(Conv2D(filters=3*81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', activation='relu'))
-        logging.debug('Layer-2 output-shape: ' + str(model.output_shape))
-        model.add(Conv2D(filters=9*81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', activation='relu'))
-        logging.debug('Layer-3 output-shape: ' + str(model.output_shape))
+        model.add(Conv2D(filters=81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', input_shape=C4_DQN_Model.model_shape, activation='relu', bias_initializer=init_random))
+        model.add(Conv2D(filters=3*81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', activation='relu', bias_initializer=init_random))
+        model.add(Conv2D(filters=9*81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', activation='relu', bias_initializer=init_random))
         #model.add(MaxPooling2D(pool_size=(2,2), data_format='channels_last'))
         model.add(Dropout(rate=0.2))
-        logging.debug('Layer-4 output-shape: ' + str(model.output_shape))
         model.add(Flatten())
-        logging.debug('Layer-5 output-shape: ' + str(model.output_shape))
-        model.add(Dense(9*81, activation='relu'))
-        logging.debug('Layer-6 output-shape: ' + str(model.output_shape))
+        model.add(Dense(9*81, activation='relu', bias_initializer=init_random))
         model.add(Dropout(rate=0.4))
-        logging.debug('Layer-7 output-shape: ' + str(model.output_shape))
-        model.add(Dense(7, activation='linear'))
-        logging.debug('Layer-8 output-shape: ' + str(model.output_shape))
+        model.add(Dense(7, activation='linear', bias_initializer=init_random))
+        logging.debug(model.summary())
         # linear output so we can have range of real-valued outputs -- stolen from http://outlace.com/Reinforcement-Learning-Part-3/
         rms = RMSprop()
         model.compile(loss="mse", optimizer=rms)

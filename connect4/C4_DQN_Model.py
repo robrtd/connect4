@@ -72,9 +72,12 @@ class C4_DQN_Model(object):
         model.add(Dense(7, activation='linear', bias_initializer=init_random))
         logging.debug(model.summary())
         # linear output so we can have range of real-valued outputs -- stolen from http://outlace.com/Reinforcement-Learning-Part-3/
-        rms = RMSprop()
-        model.compile(loss="mse", optimizer=rms)
+        return compile(model)
 
+    @staticmethod
+    def compile(model, lr=0.01, decay=0.00001):
+        rms = RMSprop(lr=lr, decay=decay)
+        model.compile(loss="mse", optimizer=rms)
         return model
 
 

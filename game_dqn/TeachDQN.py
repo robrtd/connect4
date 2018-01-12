@@ -128,7 +128,8 @@ class TeachDQN:
                 print(q_progress)
                 q_progress_list.append(q_progress)
 
-            print(q_progress_list)
+            #print(q_progress_list)
+            logging.debug("Learning is done.")
 
     def play(self):
         n = 0

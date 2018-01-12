@@ -19,7 +19,7 @@ class C4_DQN_Model(object):
     @staticmethod
     def create_model():
         #return C4_DQN_Model.create_model_conv()
-        return C4_DQN_Model.create_model_deep()
+        return C4_DQN_Model.create_model_deep_9_81()
 
     @staticmethod
     def create_model_conv():
@@ -48,6 +48,27 @@ class C4_DQN_Model(object):
         model.add(Flatten())
         model.add(Dense(9*81, activation='relu', bias_initializer=init_random))
         model.add(Dropout(rate=0.4))
+        model.add(Dense(7, activation='linear', bias_initializer=init_random))
+        logging.debug(model.summary())
+        # linear output so we can have range of real-valued outputs -- stolen from http://outlace.com/Reinforcement-Learning-Part-3/
+        rms = RMSprop()
+        model.compile(loss="mse", optimizer=rms)
+
+        return model
+
+    @staticmethod
+    def create_model_deep_9_81():
+        init_random = RandomUniform(minval=-0.05, maxval=0.05, seed=None)
+        model = Sequential()
+
+        model.add(Conv2D(filters=9*81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', input_shape=C4_DQN_Model.model_shape, activation='relu', bias_initializer=init_random))
+        model.add(Conv2D(filters=9*81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', activation='relu', bias_initializer=init_random))
+        model.add(Conv2D(filters=9*81, kernel_size=(2,2), strides=(1,1), use_bias=True, data_format='channels_last', activation='relu', bias_initializer=init_random))
+        #model.add(MaxPooling2D(pool_size=(2,2), data_format='channels_last'))
+        model.add(Dropout(rate=0.1))
+        model.add(Flatten())
+        model.add(Dense(9*81, activation='relu', bias_initializer=init_random))
+        model.add(Dropout(rate=0.1))
         model.add(Dense(7, activation='linear', bias_initializer=init_random))
         logging.debug(model.summary())
         # linear output so we can have range of real-valued outputs -- stolen from http://outlace.com/Reinforcement-Learning-Part-3/

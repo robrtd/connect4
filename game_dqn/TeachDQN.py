@@ -82,7 +82,7 @@ class TeachDQN:
         self.single_actions = single_actions
         logging.debug("model_shape: " + str(self.model_shape))
 
-        if not self.do_start_from_scratch:
+        if not self.do_start_from_scratch and not model_file is None:
             self.model.load_weights(self.MODEL_FILE)
 
 

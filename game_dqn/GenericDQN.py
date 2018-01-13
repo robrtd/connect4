@@ -2,6 +2,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import logging
 import ExperienceReplay as er
+from keras.callbacks import TensorBoard
+from time import time
 
 class GenericDQN(object):
     def __init__(self, num_actions, single_actions=False, q_learning_epochs=2, fixed_learning_epochs=2, batch_size=50):
@@ -24,6 +26,7 @@ class GenericDQN(object):
 
     def learn(self, model, model_file = None, start_from_scratch=False, reference_states=None, input_shape=None):
         q_progress = {'q_values': [], 'epochs': []}
+        tensorboard = TensorBoard(log_dir="logs/{}".format(time()))
 
         if model_file is not None and not start_from_scratch:
             model.load_weights(model_file)
@@ -55,7 +58,7 @@ class GenericDQN(object):
 
             # adapt model
             X_train, X_test, y_train, y_test = train_test_split(all_inputs, all_targets, test_size=0.01) #Xrandom_state=42)
-            model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=self.fixed_learning_epochs, batch_size=self.batch_size)
+            model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=self.fixed_learning_epochs, batch_size=self.batch_size, callbacks=[tensorboard])
             scores = model.evaluate(X_test, y_test, verbose=0)
 
             print(e, scores)

@@ -58,7 +58,10 @@ class GenericDQN(object):
 
             # adapt model
             X_train, X_test, y_train, y_test = train_test_split(all_inputs, all_targets, test_size=0.01) #Xrandom_state=42)
+            model.lr.set_value(0.001)
+            logging.debug(" Current learning rate (before fit): " + str(model.lr.get_value()))
             model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=self.fixed_learning_epochs, batch_size=self.batch_size, callbacks=[tensorboard])
+            logging.debug(" Current learning rate  (after fit): " + str(model.lr.get_value()))
             scores = model.evaluate(X_test, y_test, verbose=0)
 
             print(e, scores)

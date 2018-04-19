@@ -6,7 +6,7 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG,format='%(levelname)s:%(asctime)s %(message)s')
 
-EXECUTE_TESTS=True
+EXECUTE_TESTS=False
 
 def get_computer_player_id():
     p = 0
@@ -59,8 +59,9 @@ def perform_moves(white, black):
 
 
 computer_player = TeachDQN()
-#computer_player.load_model(model_class=C4_DQN_Model, model_file='../game_dqn/c4_model_deep_channel2_r10_eps.5-i820.h5')
-computer_player.load_model(model_class=C4_DQN_Model, model_file=None)
+#computer_player.load_model(model_class=C4_DQN_Model, model_file='../game_dqn/c4_model_deep_9-81_channel2_testr10.h5')
+computer_player.load_model(model_class=C4_DQN_Model, model_file='../game_dqn/c4_model_deep_channel2_r10-i220.h5')
+#computer_player.load_model(model_class=C4_DQN_Model, model_file=None)
 
 if EXECUTE_TESTS:
     # 1
@@ -98,7 +99,8 @@ if EXECUTE_TESTS:
 
 
 game = C4G.C4_Game(channels=C4_DQN_Model.get_channels())
-COMPUTERPLAYERID=get_computer_player_id()
+#COMPUTERPLAYERID=get_computer_player_id()
+COMPUTERPLAYERID=1
 
 while not game.is_over():
     if COMPUTERPLAYERID == 1:
@@ -112,7 +114,8 @@ while not game.is_over():
         break
     #while not game.set(get_computer_move(game.copy_board(), -1*STARTPLAYER)):
     if COMPUTERPLAYERID == -1:
-        computer_player.do_best_move(game, -1)
+        move = computer_player.do_best_move(game, -1)
+        print("Computermove: %d" % move - 1)
 game.show()
 print(game.get_winner())
 

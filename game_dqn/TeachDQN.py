@@ -104,24 +104,24 @@ class TeachDQN:
         #    self.reference_stati = np.load(REF_STATI_FILE)
 
     def learn(self):
-        ITERATIONS=2
+        ITERATIONS=48
 
         id = 0
         if self.do_learn:
             q_progress_list = []
             for iteration in range(ITERATIONS):
-                logging.info("  Starting iteration %s / %s" % (iteration, ITERATIONS-1))
+                logging.info("  Starting iteration %s / %s: perform self-play..." % (iteration, ITERATIONS-1))
                 games = []
-                for id in range(1000):
+                for id in range(200):
                     # Start testing the game
                     game = self.gameClass(win_reward=self.win_reward, channels=self.channels)
                     games.append(game)
 
-                    self.play_game(game, epsilon = 0.5 - 0.5*iteration/(ITERATIONS-1.))
+                    self.play_game(game, epsilon=0.5 - 0.5*iteration/(ITERATIONS-1.))
 
                 num_actions = self.gameClass.get_numActions()
                 #size = self.gameClass.get_size()
-                dqn_learner = GenericDQN(num_actions = num_actions, single_actions=self.single_actions, q_learning_epochs=1, fixed_learning_epochs=3)
+                dqn_learner = GenericDQN(num_actions = num_actions, single_actions=self.single_actions, q_learning_epochs=5, fixed_learning_epochs=3)
                 dqn_learner.load_games(games, input_shape=self.model_shape)
 
                 q_progress = dqn_learner.learn(model=self.model, model_file=self.MODEL_FILE, start_from_scratch=self.do_start_from_scratch, input_shape=None)

@@ -20,7 +20,7 @@ class ExperienceReplay(object):
         self.reward_t[index] = reward
         self.game_over[index] = game_over
 
-    def get_batch(self, model, single_actions = False):
+    def get_batch(self, model, single_actions=False, p=1):
         inputs = self.state_t
         targets = model.predict(inputs)
 
@@ -45,12 +45,24 @@ class ExperienceReplay(object):
 
                 targets[i, np.argmax(self.action_t[i])] = reward_value
         else:
+            q_delta = [0.0 for x in range(self.max_memory)]
+
             for i in reversed(range(self.max_memory)):
                 reward_value = self.reward_t[i]
                 if not self.game_over[i]:
                     # targets in next screen are possible opponents rewards
                     # therefore, we subtract them
                     reward_value -= self.discount * np.max(Q_sa[i])
+                old_target = targets[i, np.argmax(self.action_t[i])]
+                q_delta[i] = float(abs(reward_value - old_target))
                 targets[i, np.argmax(self.action_t[i])] = reward_value
+            # TODO: filter targets to fraction p with highest q_delta, i.e. learn from the most incorrect predictions
+            q_max = max(q_delta)
+            q_min = max(min(5, q_max*0.5), sorted(q_delta, reverse=True)[int(p*self.max_memory)])
+            new_inputs = [i for i, q in zip(inputs, q_delta) if q >= q_min]
+            new_targets = [t for t, q in zip(targets, q_delta) if q >= q_min]
+            q_delta = [q for q in q_delta if q >= q_min]
+            #logging.debug(" Remaining %d/%d: maximum target update %f, cutoff %f:" % (len(new_inputs), self.max_memory, q_max, q_min))
 
-        return inputs, targets
+        #return inputs, targets
+        return new_inputs, new_targets, q_delta

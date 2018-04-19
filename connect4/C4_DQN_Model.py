@@ -19,7 +19,8 @@ class C4_DQN_Model(object):
     @staticmethod
     def create_model():
         #return C4_DQN_Model.create_model_conv()
-        return C4_DQN_Model.create_model_deep_9_81()
+        #return C4_DQN_Model.create_model_deep_9_81()
+        return C4_DQN_Model.create_model_deep()
 
     @staticmethod
     def create_model_conv():
@@ -75,8 +76,8 @@ class C4_DQN_Model(object):
         return C4_DQN_Model.compile(model)
 
     @staticmethod
-    def compile(model, lr=0.01, decay=0.00001):
-        rms = RMSprop(lr=lr, decay=decay)
+    def compile(model, lr=0.1, decay=0.0001):
+        rms = RMSprop(lr=lr)#, decay=decay)
         model.compile(loss="mse", optimizer=rms)
         return model
 

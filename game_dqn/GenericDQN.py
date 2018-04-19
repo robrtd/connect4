@@ -1,9 +1,11 @@
+import statistics
 import numpy as np
 from sklearn.model_selection import train_test_split
 import logging
 import ExperienceReplay as er
-from keras.callbacks import TensorBoard
+from keras.callbacks import TensorBoard, ReduceLROnPlateau
 from time import time
+import keras.backend as K
 
 class GenericDQN(object):
     def __init__(self, num_actions, single_actions=False, q_learning_epochs=2, fixed_learning_epochs=2, batch_size=50):
@@ -41,10 +43,11 @@ class GenericDQN(object):
 
             all_inputs = None
             all_targets = None
+            all_q_deltas = []
 
             for el in self.experience_list:
                 # the Q-learning magic happens here...
-                inputs, targets = el.get_batch(model, single_actions=self.single_actions)
+                inputs, targets, q_delta = el.get_batch(model, single_actions=self.single_actions, p=0.25)
 
                 if input_shape is not None:
                     inputs.reshape((inputs.shape[0],) + input_shape)
@@ -56,12 +59,20 @@ class GenericDQN(object):
                     all_inputs = np.concatenate( (all_inputs, inputs), axis=0)
                     all_targets = np.concatenate( (all_targets, targets), axis=0)
 
+                all_q_deltas += q_delta
+
+            logging.debug("q_deltas: N: %d, min %f, max %f, avg %f" % (len(all_q_deltas), min(all_q_deltas), max(all_q_deltas), statistics.mean(all_q_deltas)))
             # adapt model
-            X_train, X_test, y_train, y_test = train_test_split(all_inputs, all_targets, test_size=0.01) #Xrandom_state=42)
-            model.lr.set_value(0.001)
-            logging.debug(" Current learning rate (before fit): " + str(model.lr.get_value()))
-            model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=self.fixed_learning_epochs, batch_size=self.batch_size, callbacks=[tensorboard])
-            logging.debug(" Current learning rate  (after fit): " + str(model.lr.get_value()))
+            X_train, X_test, y_train, y_test = train_test_split(all_inputs, all_targets, test_size=0.2) #Xrandom_state=42)
+            _lr = K.get_value(model.optimizer.lr)
+            logging.debug(" Current learning rate (before fit):" + str(_lr))
+            #K.set_value(model.optimizer.lr, _lr/10.)
+            reduce_lr = ReduceLROnPlateau(monitor='val_loss', patience=1, verbose=1)
+            #model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=self.fixed_learning_epochs, batch_size=self.batch_size, callbacks=[tensorboard, reduce_lr])
+            model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=self.fixed_learning_epochs,
+                      batch_size=self.batch_size, callbacks=[tensorboard])
+            _lr = K.get_value(model.optimizer.lr)
+            logging.debug(" Current learning rate  (after fit):" + str(_lr))
             scores = model.evaluate(X_test, y_test, verbose=0)
 
             print(e, scores)

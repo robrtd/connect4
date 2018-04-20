@@ -98,13 +98,16 @@ if EXECUTE_TESTS:
     print("Model performance (wins/draw/lost): ", win_cnt, draw_cnt, lost_cnt)
 
 
-game = C4G.C4_Game(channels=C4_DQN_Model.get_channels())
+game = C4G.C4_Game(channels=C4_DQN_Model.get_channels(), win_reward=10)
 #COMPUTERPLAYERID=get_computer_player_id()
 COMPUTERPLAYERID=1
 
 while not game.is_over():
     if COMPUTERPLAYERID == 1:
-        computer_player.do_best_move(game, 1)
+        #computer_player.do_best_move(game, 1)
+        move, q_val = computer_player.find_best_move(game, player=1, depth=3, search_width=2)
+        print("Computermove: %d; q_val: %f" % (move, q_val))
+        game.set_stone_by_index(move, COMPUTERPLAYERID)
         if game.is_over():
             break
     game.show()
@@ -115,7 +118,7 @@ while not game.is_over():
     #while not game.set(get_computer_move(game.copy_board(), -1*STARTPLAYER)):
     if COMPUTERPLAYERID == -1:
         move = computer_player.do_best_move(game, -1)
-        print("Computermove: %d" % move - 1)
+        print("Computermove: %d" % move)
 game.show()
 print(game.get_winner())
 

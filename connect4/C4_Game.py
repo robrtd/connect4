@@ -5,7 +5,7 @@ import random
 class C4_Game:
     numActions = 7
 
-    def __init__(self, startPlayer = 1, win_reward=1, channels=1):
+    def __init__(self, startPlayer=1, win_reward=1, channels=1):
         self.channels = channels
         self.board = []
         self.board.append(C4B.C4_Board(channels=self.channels))
@@ -21,6 +21,17 @@ class C4_Game:
 
         print(self.player, self.move)
         self.board[move].show()
+
+    def copy(self):
+        g2 = C4_Game(channels=self.channels, win_reward=self.win_reward)
+        for b in self.board[1:]:
+            g2.board.append(b.copy())
+        g2.actions = list(self.actions)
+        g2.rewards = list(self.rewards)
+        g2.move = self.move
+        g2.player = self.player
+        return g2
+
 
     def copy_board(self, move = None):
         if not move:
@@ -42,30 +53,30 @@ class C4_Game:
 
         return self.set_stone_by_index(move)
 
-    def set_stone_by_index(self, index, player = None):
+    def set_stone_by_index(self, index, player=None):
         if not player:
             player = self.player
         assert(player == self.player)
-        next_board = self.board[self.move].copy()
         if self.is_over():
             return False
+        next_board = self.board[self.move].copy()
         if not next_board.set(index, self.player):
             return False
 
         self.actions[self.move] = index
         self.rewards[self.move] = next_board.get_winner()*self.win_reward
 
-        if self.is_over():
-            return True
-
         self.actions.append(None)
-        self.rewards.append(0)
+        if next_board.is_over():
+            self.rewards.append(self.rewards[self.move])
+        else:
+            self.rewards.append(0)
         self.board.append(next_board)
         self.player *= -1
         self.move += 1
         return True
 
-    def get_reward(self, screen, player = None):
+    def get_reward(self, screen=None, player=None):
         if screen is None:
             screen = self.move
         f = 1

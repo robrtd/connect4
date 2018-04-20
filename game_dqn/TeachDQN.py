@@ -20,7 +20,8 @@ class TeachDQN:
     # TODO: parallelize model.predict, i.e. play several games in parallel
     def get_model_action(self, game):
         shape = (1,) + self.model_shape
-        move = self.model.predict(game.get_screen().get_status(player_to_play=1, shape=shape))
+        screen = game.get_screen().get_status(player_to_play=1, shape=shape)
+        move = self.model.predict(screen)
         return move[0]
 
 
@@ -44,6 +45,41 @@ class TeachDQN:
                     break
         return action_index
 
+    def find_best_move(self, game, player, depth=0, search_width=7):
+        # perform all moves with depth and choose the best evaluation 
+        action = self.get_model_action(game)
+        logging.debug("Actions (%d): %s" % (depth, str(action)))
+        zipped = zip(action, range(len(action)))
+        sorted_zipped = sorted(zipped, key=lambda x: x[0], reverse=True)
+
+        if depth == 0:
+            for q_value, action_index in sorted_zipped:
+                #logging.debug("Action index (depth=%d): %f; %d" % (depth, q_value, action_index))
+                valid_move = game.set_stone_by_index(action_index, player)
+                if valid_move:
+                    return action_index, q_value
+
+        # depth > 0
+        best_action = -1
+        best_opponent_q_value = 100
+        analyzed_moves = 0
+        for q_value, action_index in sorted_zipped:
+            game2 = game.copy()
+            valid_move = game2.set_stone_by_index(action_index, player)
+            if valid_move:
+                logging.debug("%s (%d, %d) checking move %d (%f)" % ("  "*depth, depth, analyzed_moves, action_index, q_value))
+                analyzed_moves += 1
+                if not game2.is_over():
+                    _, q_val = self.find_best_move(game2, -1*player, depth=depth-1, search_width=search_width)
+                else:
+                    q_val = -1*player*game2.get_reward()
+                if q_val < best_opponent_q_value:
+                    best_action = action_index
+                    best_opponent_q_value = q_val
+            if analyzed_moves >= search_width:
+                break
+        logging.debug("%s (%d) Best move: %d; %f" % ("  " * depth, depth, best_action, best_opponent_q_value))
+        return best_action, -1*best_opponent_q_value
 
     def do_best_move(self, game, player):
         action = self.get_model_action(game)
